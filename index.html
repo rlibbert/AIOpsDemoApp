@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOC AI Analyst - Intelligent Network Operations Center</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-network-wired"></i>
+                    <h1>NOC AI Analyst</h1>
+                </div>
+                <div class="header-stats">
+                    <div class="stat">
+                        <span class="stat-label">Active Events</span>
+                        <span class="stat-value" id="activeEventsCount">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Open Incidents</span>
+                        <span class="stat-value" id="openIncidentsCount">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">AI Status</span>
+                        <span class="stat-value status-online">ONLINE</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-icon" onclick="toggleSimulation()">
+                        <i class="fas fa-play" id="simulationIcon"></i>
+                    </button>
+                    <button class="btn-icon" onclick="openSettings()">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-container">
+            <!-- Left Panel - Event Monitor -->
+            <div class="panel event-monitor">
+                <div class="panel-header">
+                    <h2><i class="fas fa-stream"></i> Live Event Monitor</h2>
+                    <button class="btn-small" onclick="injectTestEvent()">Inject Event</button>
+                </div>
+                <div class="event-filters">
+                    <select id="severityFilter" onchange="filterEvents()">
+                        <option value="">All Severities</option>
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
+                    </select>
+                    <select id="typeFilter" onchange="filterEvents()">
+                        <option value="">All Types</option>
+                        <option value="Network">Network</option>
+                        <option value="Server">Server</option>
+                        <option value="Database">Database</option>
+                        <option value="Application">Application</option>
+                        <option value="Security">Security</option>
+                    </select>
+                </div>
+                <div class="event-list" id="eventList">
+                    <!-- Events will be dynamically added here -->
+                </div>
+            </div>
+
+            <!-- Center Panel - AI Analysis & Ticket Management -->
+            <div class="panel-group">
+                <!-- AI Analysis Panel -->
+                <div class="panel ai-analysis">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-brain"></i> AI Root Cause Analysis</h2>
+                    </div>
+                    <div class="ai-status" id="aiStatus">
+                        <i class="fas fa-robot"></i>
+                        <span>AI Agent Ready - Monitoring for events...</span>
+                    </div>
+                    <div class="analysis-content" id="analysisContent">
+                        <!-- Analysis results will appear here -->
+                    </div>
+                </div>
+
+                <!-- Active Incidents Panel -->
+                <div class="panel incidents">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-ticket-alt"></i> Active Incidents</h2>
+                        <button class="btn-small" onclick="createManualTicket()">Create Ticket</button>
+                    </div>
+                    <div class="incident-list" id="incidentList">
+                        <!-- Incidents will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Assignment & Analytics -->
+            <div class="panel-column">
+                <!-- Team Assignment Panel -->
+                <div class="panel team-assignment">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-users"></i> Team Status</h2>
+                    </div>
+                    <div class="team-list" id="teamList">
+                        <!-- Team members will be dynamically added here -->
+                    </div>
+                </div>
+
+                <!-- SLA Monitor -->
+                <div class="panel sla-monitor">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-clock"></i> SLA Monitor</h2>
+                    </div>
+                    <div class="sla-content" id="slaContent">
+                        <div class="sla-item">
+                            <span>On Track</span>
+                            <span class="sla-count good" id="slaOnTrack">0</span>
+                        </div>
+                        <div class="sla-item">
+                            <span>At Risk</span>
+                            <span class="sla-count warning" id="slaAtRisk">0</span>
+                        </div>
+                        <div class="sla-item">
+                            <span>Breached</span>
+                            <span class="sla-count critical" id="slaBreached">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Analytics -->
+                <div class="panel quick-analytics">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-chart-line"></i> Analytics</h2>
+                    </div>
+                    <div class="analytics-content" id="analyticsContent">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Detail Modal -->
+        <div id="eventModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Event Details</h3>
+                    <span class="close" onclick="closeEventModal()">&times;</span>
+                </div>
+                <div class="modal-body" id="eventModalBody">
+                    <!-- Event details will be displayed here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="analyzeEvent()">Analyze Root Cause</button>
+                    <button class="btn-secondary" onclick="createTicketFromEvent()">Create Incident</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incident Detail Modal -->
+        <div id="incidentModal" class="modal">
+            <div class="modal-content incident-modal">
+                <div class="modal-header">
+                    <h3>Incident Details</h3>
+                    <span class="close" onclick="closeIncidentModal()">&times;</span>
+                </div>
+                <div class="modal-body" id="incidentModalBody">
+                    <!-- Incident details will be displayed here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="updateIncident()">Update Status</button>
+                    <button class="btn-secondary" onclick="addWorkNote()">Add Work Note</button>
+                    <button class="btn-warning" onclick="escalateIncident()">Escalate</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Configuration Settings</h3>
+                    <span class="close" onclick="closeSettings()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="settings-section">
+                        <h4>Simulation Settings</h4>
+                        <div class="setting-item">
+                            <label>Event Generation Frequency (seconds)</label>
+                            <input type="range" id="eventFrequency" min="5" max="60" value="15" onchange="updateEventFrequency(this.value)">
+                            <span id="eventFrequencyValue">15</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>AI Analysis Confidence Threshold</label>
+                            <input type="range" id="confidenceThreshold" min="50" max="95" value="75" onchange="updateConfidenceThreshold(this.value)">
+                            <span id="confidenceThresholdValue">75%</span>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h4>SLA Configuration</h4>
+                        <div class="setting-item">
+                            <label>Critical SLA (hours)</label>
+                            <input type="number" id="criticalSLA" value="1" min="1" max="24">
+                        </div>
+                        <div class="setting-item">
+                            <label>High SLA (hours)</label>
+                            <input type="number" id="highSLA" value="4" min="1" max="48">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="saveSettings()">Save Settings</button>
+                    <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manual Event Injection Modal -->
+        <div id="injectEventModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Inject Test Event</h3>
+                    <span class="close" onclick="closeInjectModal()">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Severity</label>
+                        <select id="injectSeverity">
+                            <option value="Critical">Critical</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="injectType">
+                            <option value="Network">Network</option>
+                            <option value="Server">Server</option>
+                            <option value="Database">Database</option>
+                            <option value="Application">Application</option>
+                            <option value="Security">Security</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Source System</label>
+                        <input type="text" id="injectSource" placeholder="e.g., server-web-01">
+                    </div>
+                    <div class="form-group">
+                        <label>Message</label>
+                        <textarea id="injectMessage" placeholder="Event description..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" onclick="submitInjectEvent()">Inject Event</button>
+                    <button class="btn-secondary" onclick="closeInjectModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/mockData.js"></script>
+    <script src="js/eventService.js"></script>
+    <script src="js/serviceNowAPI.js"></script>
+    <script src="js/aiAnalysisEngine.js"></script>
+    <script src="js/assignmentEngine.js"></script>
+    <script src="js/ticketManagement.js"></script>
+    <script src="js/analytics.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
