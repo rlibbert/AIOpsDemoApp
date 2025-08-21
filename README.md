@@ -2,6 +2,8 @@
 
 A full-featured web application that simulates an agentic AI acting as a NOC (Network Operations Center) analyst. The application implements a complete workflow for monitoring events, analyzing root causes, and creating ServiceNow tickets with intelligent assignment.
 
+![Image](https://github.com/user-attachments/assets/50f0581d-bc04-463b-a3e2-a1ba6be63b08)
+
 ## 🚀 Features
 
 ### Core Functionality
@@ -232,3 +234,4 @@ Built to demonstrate the complete NOC analyst workflow with AI-driven automation
 ---
 
 **Note**: This is a simulation application with mock data. For production use, integrate with actual monitoring tools and ServiceNow APIs.
+
